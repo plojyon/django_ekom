@@ -20,6 +20,7 @@ urlpatterns = [
 	path('admin/', admin.site.urls),
 	path('', include('gui.urls')),
 	#path('gui/', include('gui.urls')),
+	path('api/', include('restapi.urls')),
 ]
 
 from django.conf.urls.static import static

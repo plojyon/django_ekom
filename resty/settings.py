@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -129,3 +130,9 @@ MEDIA_URL = '/media/'
 # Path where media is stored
 import os
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
+
+# configure REST pagination
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
