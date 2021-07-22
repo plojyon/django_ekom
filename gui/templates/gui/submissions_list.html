@@ -1,9 +1,11 @@
+<!DOCTYPE html>
+
+<!--
 <h1>Datoteke</h1>
 <form action="." method="get">
 	{{ filters }}
 </form>
 <a href="{% url 'upload' %}">Nalozi svoje</a>
-{{ letnik }}
 <ul>{% for f in submissions %}
 	<li>
 		<a href="{{ f.url }}"><b>{{ f.title }}</b></a>
@@ -11,3 +13,98 @@
 		({{ f.tags_arr|join:", " }})
 	</li>
 {% endfor %}</ul>
+-->
+
+<html lang="sl">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+		<link href="static/fontawesome/css/all.css" rel="stylesheet">
+		<link rel="stylesheet" href="static/index.css">
+		<meta name="author" content="Yon Ploj, Luka Urbanč">
+		<!-- ne pozabite se dodati kot avtor! -->
+		<script src="static/scripts/generate_submissions.js"></script>
+		<script src="static/scripts/generate_predmeti.js"></script>
+		<script src="static/scripts/filters.js"></script>
+		<!--
+		<script>
+			window.onload = function() {
+				Object.keys(predmeti).forEach(addPredmet);
+				Object.keys(predmeti).forEach(addProfessors);
+			}
+		</script>
+		-->
+		<title>Zapiski Ledina</title>
+		<!--Hey!
+		Imas izkusnje z razvijanjem spletnih strani?
+
+		Pridruzi se tutorski ekipi in pomagaj pri razvoju prav te!
+
+		Projekt je open-source, najdes ga na githubu: https://github.com/plojyon/ekom.
+		Ce pa zelis pomagati, se oglasi v kabinetu pri Anji Vidmar in z veseljem te bomo sprejeli!
+
+		Ne pozabi, da s sodelovanjem pri razvoju dobis tudi ostale tutorske privilegije, npr. koncni izlet in tocke za naj razred!
+
+		Pricakujemo te!
+			-Ekipa tutorjev Ledine-->
+	</head>
+	<body>
+	<div id="banner">
+		<a href="https://www.ledina.si/">
+			<img src="static/ledina_logo.png">
+		</a>
+		<nav>
+			<a href="https://tutorstvo.ledina.si/"><i class="fas fa-graduation-cap"></i>&nbsp;Tutorstvo na Gimnaziji Ledina</a>
+			<a href="{% url 'upload' %}"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;Objavi svoje zapiske</a>
+			<a href="https://www.ledina.si/"><i class="fas fa-school"></i>&nbsp;Spletna stran Gimnazije Ledina</a>
+		</nav>
+	</div>
+	<main>
+		<article id="submissions_list">
+			<div class="submission" id="opozorilo">
+				<p><b>OPOZORILO:</b>
+					Zapiski na tej spletni strani so avtorska dela dijakov,
+					ki niso strokovno pregledana. Uporabljajte material na lastno odgovornost!
+				</p>
+			</div>
+			{% if not submissions %}
+			<div class="submission" id="noresult">
+				<p>Nobena objava ne ustreza vašemu iskanju. <a href=".">Ponastavi filtre</a>.<p>
+			</div>
+			{% endif %}
+
+			{% for f in submissions %}
+				<a id="{{ f.id }}" href="{{ f.url }}" class="submission {{ f.subject.slug }}">
+					<div>
+						<div class="subject_icon">
+							<i class="{{ f.subject.icon }}"></i>
+						</div>
+						<p class="subject_name">{{ f.subject.name }}</p>
+					</div>
+					<div class="submission_text">
+						<span class="submission_title">{{ f.title }}</span>
+						<p class="tags">
+							{% for tag in f.tags_arr %}
+								<span class="tag">{{ tag }}</span>
+							{% endfor%}
+						</p>
+						<div class="spacer"></div>
+						<div class="submission_info">
+							<p class="letnik"><i class="fas fa-dice-three"></i>{{ f.year_name }}</p>
+							<p class="type"><i class="fas fa-question"></i>{{ f.type_name }}</p>
+							<p class="professor"><i class="fas fa-chalkboard-teacher"></i>{{ f.professor.full_name }}</p>
+							<p class="author"><i class="fas fa-pencil-alt"></i>{{ f.author }}</p>
+						</div>
+					</div>
+				</a>
+			{% endfor %}
+		</article>
+		<a id="mobile_upload" href="{% url 'upload' %}"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;Objavi svoje zapiske</a>
+		<aside id="filters-and-login">
+			<form action="." method="get">
+				{{ filters }}
+			</form>
+		</aside>
+	</main>
+</html>

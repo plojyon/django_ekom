@@ -39,6 +39,7 @@ class Professor(models.Model):
 class Subject(models.Model):
 	name = models.CharField(max_length=50)
 	slug = models.CharField(max_length=10, unique=True)
+	icon = models.CharField(max_length=20, default="fa fa-language")
 
 	def __str__(self):
 		return self.name
@@ -86,11 +87,11 @@ class AuthCode(models.Model):
 		return ac.code
 
 class Year(models.IntegerChoices):
-	OTHER = 0, gettext_lazy("Neznan")
-	FIRST = 1, gettext_lazy("Prvi")
-	SECOND = 2, gettext_lazy("Drugi")
-	THIRD = 3, gettext_lazy("Tretji")
-	FOURTH = 4, gettext_lazy("Četrti")
+	OTHER = 0, gettext_lazy("Vsi letniki / drugo")
+	FIRST = 1, gettext_lazy("1. letnik")
+	SECOND = 2, gettext_lazy("2. letnik")
+	THIRD = 3, gettext_lazy("3. letnik")
+	FOURTH = 4, gettext_lazy("4. letnik")
 
 class Type(models.IntegerChoices):
 	OTHER = 0, gettext_lazy("Drugo")
@@ -135,6 +136,16 @@ class Submission(models.Model):
 	def url(self):
 		"""Download link to the resource."""
 		return settings.MEDIA_URL + self.file.name
+
+	@property
+	def type_name(self):
+		"""Self.type, but resolved as a string."""
+		return Type(self.type).label
+
+	@property
+	def year_name(self):
+		"""Self.year, but resolved as a string."""
+		return Year(self.year).label
 
 	@staticmethod
 	def generate_filename(subject_id, old_filename):

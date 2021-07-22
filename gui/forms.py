@@ -1,6 +1,15 @@
 from django import forms
 from backend.models import Type, Year, Professor, Subject, Tag, Extensions
 
+# use this if makemigrations fails (just uncomment, migrate, then comment back again)
+"""
+class UploadFileForm(forms.Form):
+	pass
+class FilterForm(forms.Form):
+	pass
+class AuthcodeGeneratorForm(forms.Form):
+	pass
+"""
 class UploadFileForm(forms.Form):
 	file = forms.FileField(label='Datoteka')
 	#extension = forms.ChoiceField(choices=[(e, e) for e in Extensions], label='Končnica')
