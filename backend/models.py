@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from datetime import datetime
 import random
+from django.conf import settings
 
 class Tag(models.Model):
 	name = models.CharField(max_length=50)
@@ -119,6 +120,21 @@ class Submission(models.Model):
 	def tags_arr(self):
 		"""Array of tags on this submission."""
 		return [tag.name for tag in self.tags.all()];
+
+	@property
+	def prof_name(self):
+		"""Professor's full name."""
+		return self.professor.full_name
+
+	@property
+	def subject_name(self):
+		"""Subject's name."""
+		return self.subject.name
+
+	@property
+	def url(self):
+		"""Download link to the resource."""
+		return settings.MEDIA_URL + self.file.name
 
 	@staticmethod
 	def generate_filename(subject_id, old_filename):

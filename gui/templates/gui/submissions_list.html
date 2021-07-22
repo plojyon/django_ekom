@@ -6,7 +6,7 @@
 {{ letnik }}
 <ul>{% for f in submissions %}
 	<li>
-		<a href="media/{{ f.file.name }}"><b>{{ f.title }}</b></a>
+		<a href="{{ f.url }}"><b>{{ f.title }}</b></a>
 		by {{ f.author }}
 		({{ f.tags_arr|join:", " }})
 	</li>
