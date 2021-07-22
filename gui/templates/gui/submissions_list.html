@@ -1,0 +1,13 @@
+<h1>Datoteke</h1>
+<form action="." method="get">
+	{{ filters }}
+</form>
+<a href="{% url 'upload' %}">Nalozi svoje</a>
+{{ letnik }}
+<ul>{% for f in submissions %}
+	<li>
+		<a href="media/{{ f.file.name }}"><b>{{ f.title }}</b></a>
+		by {{ f.author }}
+		({{ f.tags_arr|join:", " }})
+	</li>
+{% endfor %}</ul>

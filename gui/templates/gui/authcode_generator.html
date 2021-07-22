@@ -1,0 +1,9 @@
+<h1>Get authcode</h1>
+{% if error != "" %}<b style="color:red">{{ error }} <a href=".">Clear</a></b>{% endif %}
+{% if success != "" %}<b style="color:green">{{ success }} <a href=".">Clear</a></b>{% endif %}
+<form action="." method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Poslji zahtevek">
+</form>
+<a href="{% url 'submissions_list' %}">Nazaj</a>

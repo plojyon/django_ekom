@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
 from datetime import datetime
+import random
 
 class Tag(models.Model):
 	name = models.CharField(max_length=50)
@@ -52,9 +53,13 @@ class AuthCode(models.Model):
 	def __str__(self):
 		return self.code
 
-	def is_valid(self):
-		"""Checks if the code is unused."""
-		return self.used_datetime is None
+	@staticmethod
+	def is_valid(code):
+		"""Checks if the code exists and is unused."""
+		ac = AuthCode.objects.filter(code=code)
+		if ac.count() != 1: return False
+		ac = ac[0]
+		return ac.used_datetime is None
 
 	@staticmethod
 	def is_available(code):
@@ -64,7 +69,7 @@ class AuthCode(models.Model):
 	@staticmethod
 	def use(submission, code):
 		"""Uses the code on a submission."""
-		ac = AuthCode.objects.get(code)
+		ac = AuthCode.objects.get(code=code)
 		ac.used_datetime = datetime.now()
 		ac.used_file = submission
 
