@@ -27,10 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+DEFAULT_AUTO_FIELD='django.db.models.AutoField'
 
 # Application definition
 
 INSTALLED_APPS = [
+    'backend',
+    'gui',
+    'restapi',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
