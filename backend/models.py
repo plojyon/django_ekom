@@ -80,7 +80,7 @@ class AuthCode(models.Model):
 		"""Create an AuthCode object from data returned by AuthCodeForm."""
 		ac = AuthCode()
 		# *probably* won't have a conflict ....
-		ac.code = str(random.randint(10000000000, 99999999999))
+		ac.code = hex(random.randint(10000000000, 99999999999))
 		ac.authorised_by = Professor.objects.get(username=data['username'])
 		ac.purpose = data['purpose']
 		ac.save()
