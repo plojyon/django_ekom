@@ -128,9 +128,9 @@ class Submission(models.Model):
 		return self.professor.full_name
 
 	@property
-	def subject_name(self):
-		"""Subject's name."""
-		return self.subject.name
+	def subject_slug(self):
+		"""Subject's slug."""
+		return self.subject.slug
 
 	@property
 	def url(self):

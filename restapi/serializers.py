@@ -18,4 +18,4 @@ from backend.models import Submission
 class SubmissionSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
 		model = Submission
-		fields = ['title', 'author', 'year', 'prof_name', 'subject_name', 'tags_arr', 'type', 'url']
+		fields = ['title', 'author', 'year', 'prof_name', 'subject_slug', 'tags_arr', 'type_name', 'url']

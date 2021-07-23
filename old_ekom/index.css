@@ -1,0 +1,277 @@
+.submission, #submission_upload {
+	display: flex;
+	border: 1px solid black;
+	border-radius: 3px;
+	padding: 20px;
+	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+	margin: 0 auto;
+	margin-bottom: 1em;
+	background-color: rgba(255,255,255,0.8);
+	width: 95%;
+}
+.submission img {
+	width: 100px;
+}
+.submission_text {
+	flex: 1;
+	margin-left: 20px;
+	display: flex;
+	flex-direction: column;
+}
+.submission_title {
+	font-size: 1.3em;
+	font-weight: bold;
+}
+p {
+	margin: 2px;
+}
+.tags {
+	margin: 0.3em 0;
+}
+.tag {
+	background-color: darkgray;
+	padding: 0.1em 0.4em;
+	border-radius: 5px;
+	font-size: 0.9em;
+	line-height: 1.6em;
+	white-space: nowrap;
+}
+body {
+	font-family: "Roboto";
+	margin: 0;
+	background-image: url("media/backgrounds/kemija.jpg");
+	background-attachment: fixed;
+	background-position: center top;
+	background-size: cover;
+}
+#banner	{
+	display: flex;
+	justify-content: space-between;
+	height: 160px;
+	background-color: rgba(0,0,0,.5);
+	background: linear-gradient(to right, white, white, rgba(0,0,0,.5), rgba(0,0,0,.5))
+}
+#header {
+	color: black;
+	font: Helvetica;
+}
+a.submission {
+	text-decoration: none;
+	color: black;
+}
+main {
+	display: flex;
+	justify-content: space-around;
+}
+#submissions_list {
+	margin-top: 1em;
+	padding-bottom: 3em;
+	margin-left: 25px;
+	width: 100%;
+}
+#upload_filters {
+	display: flex;
+	height: 10%;
+}
+aside, #mobile_upload {
+	position: sticky;
+	top: 20px;
+	border: dashed;
+	margin: 25px;
+	padding: 25px;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	display: flex;
+	flex-direction: column;
+	background-color: rgba(255,255,255,.8);
+	min-width: 200px;
+	height: 100%;
+}
+h1 {
+	display: inline;
+}
+aside > * {
+	margin: 10px 0;
+}
+select {
+	width: 100%;
+}
+nav {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	margin: 50px;
+}
+nav a {
+	color: white;
+	margin: 10px;
+	padding: 5px;
+	font-size: 17px;
+	text-decoration: none;
+}
+nav a:hover {
+	text-decoration: underline;
+}
+#noresult {
+	width: 50%;
+	justify-content: center;
+}
+
+#opozorilo h1 {
+	margin-top: 0;
+	text-align: center;
+}
+
+#opozorilo {
+	display:flex;
+	justify-content: center;
+}
+
+.subject_icon {
+	font-size: 5em;
+	border-style: dotted;
+	border-width: 3px;
+	border-color: rgba(0,0,0,0.7);
+	padding: 10px;
+	width: 1.2em;
+	text-align: center;
+}
+.subject_name, #upload_subject {
+	text-align: center;
+	font-size: 0.9em;
+	position: relative;
+	top: 7px;
+	color: rgba(0,0,0,0.7);
+}
+.spacer {
+	flex: 1;
+}
+.submission_info {
+	flex: 1;
+	color: rgba(0,0,0,.7);
+}
+p.author, p.professor {
+	align-items: baseline;
+}
+.submission_info a {
+	float: right;
+	background-color: rgba(0,0,0,0.3);
+	border-style: dotted;
+	border-width: 2px;
+	border-color: rgba(0,0,0,0.3);
+	height: auto;
+	width: auto;
+	display: flex;
+	justify-content: center;
+	color: rgba(0,0,0,0.7);
+	text-decoration: none;
+}
+.submission_info a:hover {
+	text-decoration: underline;
+}
+
+#letnik_contents, #predmet_contents, #type_contents, #profesor_contents {
+	margin-top: 0;
+	margin-bottom: 15px;
+}
+/* End of index.html style. Start of upload.html (not really)*/
+ #upload_title {
+	 font-size: 1.3em;
+	 font-weight: bold;
+ }
+ #upload_contents {
+	 display: flex;
+	 flex-direction: row;
+ }
+ #upload_professor, #upload_author {
+	 display: flex;
+	 flex-direction: column;
+	 margin: 5px;
+ }
+ #upload_form {
+	 display: flex;
+	 justify-content: space-between;
+ }
+ #file-select-and-upload {
+	 float: right;
+	 position: relative;
+	 top: 75px;
+	 display: flex;
+	 justify-content: center;
+ }
+
+ #mobile_upload {
+	 display: none;
+ }
+
+.hidden {
+	display: none; !important
+}
+
+
+/* adjust margins to align icons due to various width */
+.letnik i {
+	margin-right: 9px;
+	margin-left: 3px;
+}
+.letnik i.fa-dice { /* vsi predmeti icon is slightly wider */
+	margin-left: 0;
+	margin-right: 5px;
+}
+.type i {
+	margin-left: 4px;
+	margin-right: 9px;
+}
+.professor i {
+	margin-right: 5px;
+}
+.author i {
+	margin-left: 2px;
+	margin-right: 7px;
+}
+
+
+@media only screen and (max-width: 800px) {
+	main {
+		display: flex;
+		flex-direction: column-reverse;
+	}
+
+	#submissions_list {
+		margin-left: 0;
+	}
+	.submission {
+		width: 80%;
+	}
+
+	#banner {
+		display: none;
+	}
+
+	aside, #mobile_upload {
+		width: 30%;
+		margin: auto;
+		margin-bottom: 25px;
+		position: relative;
+	}
+
+	aside h1 {
+		font-weight: normal;
+	}
+
+	body {
+		font-size: 0.8em;
+	}
+
+	#mobile_upload {
+		display: initial;
+		text-decoration: none;
+		color: black;
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		font-size: 1.3em;
+	}
+
+
+}

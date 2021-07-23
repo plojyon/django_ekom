@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="sl">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="upload.css">
+		<meta name="author" content="Yon Ploj, Luka Urbanč">
+		<title>Objava zapiskov</title>
+		<script src="scripts/generate_predmeti.js"></script>
+		<script>
+			function findSize() {
+				var fileInput =  document.getElementById("file_upload");
+				var size = 0;
+				try { // Size returned in bytes.
+					size = fileInput.files[0].size;
+				} catch(e) {
+					var objFSO = new ActiveXObject("Scripting.FileSystemObject");
+					var e = objFSO.getFile(fileInput.value);
+					size = e.size;
+				}
+				if (size >= 8388608) {
+					alert("Velikost datoteke presega 8 MiB. Če datoteke ni mogoče razdeliti, se obrni na administratorja.");
+					document.getElementById('file_upload').value= null;
+				}
+			}
+
+			function trim_tags() {
+				element = document.getElementById("tags_upload");
+				tags = element.value.split(',');
+				new_tags = [];
+				for (tag in tags) {
+					new_tag = tags[tag].trim();
+					if (new_tag != "") new_tags.push(new_tag);
+				}
+				element.value = new_tags.join(",");
+			}
+		</script>
+		<script>
+			window.onload = function() {
+				Object.keys(predmeti).forEach(addPredmet);
+				Object.keys(predmeti).forEach(addProfessors);
+			}
+		</script>
+		<!--Hey!
+		Imas izkusnje z razvijanjem spletnih strani?
+
+		Pridruzi se tutorski ekipi in pomagaj pri razvoju prav te!
+
+		Projekt je open-source, najdes ga na githubu: https://github.com/plojyon/ekom.
+		Ce pa zelis pomagati, se oglasi v kabinetu pri Anji Vidmar in z veseljem te bomo sprejeli!
+
+		Ne pozabi, da s sodelovanjem pri razvoju dobis tudi ostale tutorske privilegije, npr. koncni izlet in tocke za naj razred!
+
+		Pricakujemo te!
+			-Ekipa tutorjev Ledine-->
+	</head>
+	<body>
+		<div id="basic_form">
+			<div id="form_header">
+				Obrazec za objavo datoteke
+			</div>
+			<details id="navodila">
+				<summary>Navodila za izpolnjevanje:</summary>
+				<p>Izberi si unikatno ime ali psevdonim, po katerem boš znan na Ledinskih zapiskih. Registracija ni potrebna.<br>
+				Poimenuj datoteko, tako da bo jasno kaj vsebuje. Bodi čim bolj natančen in izviren.<br>
+				Vsebino opiši z oznakami, ločenimi z vejicami.<br>
+				Izberi letnik, v katerem se snov jemlje in profesorja, ki je snov predaval.<br>
+				<b>Velikost datoteke naj bo manj kot 8 MiB.</b> Če velikost presega omejitev, razdeli snov na več poglavij. Če to ni možno, se obrni na administratorja.<br>
+				<b>Kodo za objavo dobiš pri kateremkoli profesorju ali šolski psihologinji.</b><br>
+				Za generiranje kode <a href="auth.html">klikni tukaj</a>.<br><br>
+				Vsa polja označena z * so obvezna.</p>
+			</details>
+			<form enctype="multipart/form-data" onsubmit="trim_tags()" action="services/upload.php" method="post">
+				<div class="question">* Ime ali psevdonim:</div>
+				<input type="text" name="author" id="author_upload" class="answer" placeholder="Vili Čar" required><br>
+				<div class="question">* Izviren naslov:</div>
+				<input type="text" name="title" id="title_upload" class="answer" placeholder="Rešene naloge iz vektorjev" required><br>
+				<div class="question">Oznake (tags):</div>
+				<input type="text" name="tags" id="tags_upload" class="answer" placeholder="vektorji,premice,tocka"><br>
+				<div class="question">* Vrsta objave:</div>
+				<select name="type" id="type_upload" class="answer" required>
+					<option selected="true">Zapiski</option>
+					<option>Test</option>
+					<option>Naloge</option>
+					<option>Laboratorijske vaje</option>
+					<option>Drugo</option>
+				</select><br>
+				<div class="question">Izberi letnik:</div>
+				<select name="letnik" id="letnik_upload" class="answer">
+					<option selected="true" value="0">Vsi letniki / drugo</option>
+					<option value="1">1. Letnik</option>
+					<option value="2">2. Letnik</option>
+					<option value="3">3. Letnik</option>
+					<option value="4">4. Letnik</option>
+				</select><br>
+				<div class="question">Izberi profesorja:</div>
+				<select name="professor" id="professor_select" class="answer">
+					<option selected="true" value="">Brez profesorja</option>
+				</select><br>
+				<div class="question">* Izberi predmet:</div>
+				<select name="predmet" id="predmet_select" class="answer" required>
+					<option selected="true" disabled="disabled">Predmet</option>
+				</select><br>
+				<div class="question">* Naloži datoteko (do 8 MB):</div>
+				<input type="file" name="file" id="file_upload" class="answer" onchange="findSize()" required><br>
+				<div class="question">* Koda za objavo: <sup><a onclick="document.getElementById('navodila').open = true;">[?]</a></sup></div>
+				<input type="password" name="code" id="coda_upload" class="answer" required><br>
+				<div id="submit_query">
+					<input type="submit" id="submit" value="Oddaj datoteko">
+					<input type="button" id="back" value="Nazaj" onclick="window.location.href='index.html';">
+				</div>
+				<br>
+			</form>
+		</div>
+	</body>
+</html>

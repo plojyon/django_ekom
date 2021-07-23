@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="sl">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link href="https://fonts.googleapis.com/css?family=Roboto&display=swap" rel="stylesheet">
+		<link href="fontawesome/css/all.css" rel="stylesheet">
+		<link rel="stylesheet" href="index.css">
+		<meta name="author" content="Yon Ploj, Luka Urbanč">
+		<!-- ne pozabite se dodati kot avtor! -->
+		<script src="scripts/generate_submissions.js"></script>
+		<script src="scripts/generate_predmeti.js"></script>
+		<script src="scripts/filters.js"></script>
+		<script>
+			window.onload = function() {
+				Object.keys(predmeti).forEach(addPredmet);
+				Object.keys(predmeti).forEach(addProfessors);
+			}
+		</script>
+		<title>Zapiski Ledina</title>
+		<!--Hey!
+		Imas izkusnje z razvijanjem spletnih strani?
+
+		Pridruzi se tutorski ekipi in pomagaj pri razvoju prav te!
+
+		Projekt je open-source, najdes ga na githubu: https://github.com/plojyon/ekom.
+		Ce pa zelis pomagati, se oglasi v kabinetu pri Anji Vidmar in z veseljem te bomo sprejeli!
+
+		Ne pozabi, da s sodelovanjem pri razvoju dobis tudi ostale tutorske privilegije, npr. koncni izlet in tocke za naj razred!
+
+		Pricakujemo te!
+			-Ekipa tutorjev Ledine-->
+	</head>
+	<body>
+	<div id="banner">
+		<a href="https://www.ledina.si/">
+			<img src="media/ledina_logo.png">
+		</a>
+		<nav>
+			<a href="https://tutorstvo.ledina.si/"><i class="fas fa-graduation-cap"></i>&nbsp;Tutorstvo na Gimnaziji Ledina</a>
+			<a href="upload.html"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;&nbsp;Objavi svoje zapiske</a>
+			<a href="https://www.ledina.si/"><i class="fas fa-school"></i>&nbsp;Spletna stran Gimnazije Ledina</a>
+		</nav>
+	</div>
+	<main>
+		<article id="submissions_list">
+			<div class="submission" id="opozorilo">
+				<p><b>OPOZORILO:</b>
+					Zapiski na tej spletni strani so avtorska dela dijakov,
+					ki niso strokovno pregledana. Uporabljajte material na lastno odgovornost!
+				</p>
+			</div>
+			<div class="submission hidden" id="noresult">
+				<p>Nobena objava ne ustreza vašemu iskanju. <a href="">Ponastavi filtre</a>.<p>
+			</div>
+			<!--
+			<div id="zapiski_kem_1.png" class="submission kem">
+				<div>
+					<div class="subject_icon"><i class="fa fa-flask"></i></div>
+					<p class="subject_name">Kemija</p>
+				</div>
+				<div class="submission_text">
+					<a class="submission_title" href="/files/zapiski_kem_1.png">Kemija v prvem letniku (celotni zapiski)</a>
+					<p class="tags"><a class="tag">Elementi v PSE</a> <a class="tag">Kemijsko racunanje</a> <a class="tag">Lepa pisava</a> </p>
+					<div class="spacer"></div>
+					<div class="submission_info">
+						<p class="professor"><i class="fas fa-chalkboard-teacher"></i> Nika Cebin</p>
+						<p class="author"><i class="fas fa-pencil-alt"></i> Masa Kovac</p>
+					</div>
+				</div>
+			</div>
+			-->
+		</article>
+		<a id="mobile_upload" href="upload.html"><i class="fa fa-book" aria-hidden="true"></i>&nbsp;Objavi svoje zapiske</a>
+		<aside id="filters-and-login">
+			<details>
+				<summary><h1>Filtri</h1></summary>
+				<br>
+				<section id="letnik_contents">
+					<p>Letnik:</p>
+					<select id="letnik_select" onchange="refresh_filters()">
+						<option value="" selected>Vseeno mi je</option>
+						<option value="1">1. Letnik</option>
+						<option value="2">2. Letnik</option>
+						<option value="3">3. Letnik</option>
+						<option value="4">4. Letnik</option>
+					</select>
+				</section>
+				<section id="type_contents">
+					<p>Vrsta:</p>
+					<select id="type_select" onchange="refresh_filters()">
+						<option value="" selected>Vseeno mi je</option>
+						<option>Zapiski</option>
+						<option>Test</option>
+						<option>Naloge</option>
+						<option>Laboratorijske vaje</option>
+						<option>Drugo</option>
+					</select>
+				</section>
+				<section id="profesor_contents">
+					<p>Profesor:</p>
+					<select id="professor_select" onchange= "refresh_filters()">
+						<option value="" selected>Vseeno mi je</option>
+						<!-- Filled by javascript -->
+						<!--
+						<optgroup label="Angleščina">
+							<option>Matejka Kuhar</option>
+							<option>Maja Lebar Bajec</option>
+						</optgroup>
+						<optgroup label="Biologija">
+							<option>Veronika Babič</option>
+						</optgroup>
+						etc.
+						-->
+					</select>
+				</section>
+				<section id="predmet_contents">
+					<p>Predmet:</p>
+					<select id="predmet_select" onchange= "refresh_filters()">
+						<option value="" selected>Vseeno mi je</option>
+						<!-- Filled by javascript -->
+						<!-- <option value="mat">Matematika</option> -->
+					</select>
+				</section>
+			</details>
+			<script>
+				// da se filtri odprejo po defaultu
+				if (screen.width >= 800) { // (ampak ne na mobilni strani)
+					Array.from(document.querySelectorAll('details')).forEach(function(obj, idx) {
+						obj.open = true;
+					});
+				}
+			</script>
+		</aside>
+		<!--Dear Špela,
+			I love you with all my heart. Thank you for everything. Can't wait to spend my life with you.
+
+			Yours,
+			Luka Urbanč <3
+	</main>
+</html>
+<!--I would rather attempt something great and fail, than attempt nothing and succeed-->
