@@ -13,4 +13,5 @@ router.register(r'authcodes', views.AuthcodeViewSet)
 urlpatterns = [
     path('', include(router.urls)),
     path('auth/', include('rest_framework.urls', namespace='rest_framework')),
+    path('template/', views.index),
 ]
