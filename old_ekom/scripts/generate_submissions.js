@@ -32,7 +32,7 @@ function createSubmission(sub, index, arr) {
 	icon = document.createElement("i");
 	// icon is an <i> with classes fa and fa-flask (first determines style, second determines icon type)
 	if (!(sub.subject_slug in predmeti)) sub.subject_slug = "all";
-	icon_classes = predmeti[sub.subject_slug].icon.split(" ");
+	icon_classes = predmeti[sub.subject].icon.split(" ");
 	icon.classList.add(icon_classes[0]);
 	icon.classList.add(icon_classes[1]);
 	icon_div = document.createElement("div");
@@ -40,7 +40,7 @@ function createSubmission(sub, index, arr) {
 	icon_div.appendChild(icon);
 
 	icon_label = document.createElement("p");
-	icon_label.innerText = predmeti[sub.subject_slug].name;
+	icon_label.innerText = predmeti[sub.subject].name;
 	icon_label.classList.add("subject_name");
 
 	subject_indicator = document.createElement("div");
@@ -54,10 +54,10 @@ function createSubmission(sub, index, arr) {
 
 	tags = document.createElement("p");
 	tags.classList.add("tags");
-	for (tag in sub.tags_arr) {
+	for (tag in sub.tags) {
 		t = document.createElement("a");
 		t.classList.add("tag");
-		t.innerText = sub.tags_arr[tag];
+		t.innerText = sub.tags[tag];
 		tags.appendChild(t);
 		tags.appendChild(document.createTextNode(" "));
 	}
@@ -91,7 +91,7 @@ function createSubmission(sub, index, arr) {
 	type = document.createElement("p");
 	type.classList.add("type");
 	type.appendChild(type_icon);
-	type.appendChild(document.createTextNode(sub.type_name));
+	type.appendChild(document.createTextNode(sub.type));
 
 	prof_icon = document.createElement("i");
 	prof_icon.classList.add("fas");
@@ -99,7 +99,7 @@ function createSubmission(sub, index, arr) {
 	professor = document.createElement("p");
 	professor.classList.add("professor");
 	professor.appendChild(prof_icon);
-	professor.appendChild(document.createTextNode(sub.prof_name));
+	professor.appendChild(document.createTextNode(sub.professor));
 
 	auth_icon = document.createElement("i");
 	auth_icon.classList.add("fas");
@@ -124,10 +124,10 @@ function createSubmission(sub, index, arr) {
 	text_div.appendChild(submission_info);
 
 	submission = document.createElement("a");
-	submission.id = sub.filename;
-	submission.href = "files/"+sub.filename;
+	submission.id = sub.url;
+	submission.href = "../" + sub.url.substring(1); // go out of old_ekom directory
 	submission.classList.add("submission");
-	submission.classList.add(sub.subject_slug);
+	submission.classList.add(sub.subject);
 	submission.appendChild(subject_indicator);
 	submission.appendChild(text_div);
 

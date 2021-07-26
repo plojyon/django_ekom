@@ -5,10 +5,10 @@ function refresh_filters() {
 		var filter_predmet = document.getElementById("predmet_select").value;
 		var filter_professor = document.getElementById("professor_select").value;
 		var submission_letnik = submission ["year"];
-		var submission_type = submission ["type_name"];
-		var submission_predmet = submission ["subject_slug"];
-		var submission_professor = submission ["prof_name"];
-		var elementname = document.getElementById(submission ["filename"]);
+		var submission_type = submission ["type"];
+		var submission_predmet = submission ["subject"];
+		var submission_professor = submission ["professor"];
+		var elementname = document.getElementById(submission ["url"]);
 		if ((filter_letnik == submission_letnik || filter_letnik == "" || submission_letnik == "0") &&
 			(filter_type == submission_type || filter_type == "") &&
 			(filter_predmet == submission_predmet || filter_predmet == "") &&

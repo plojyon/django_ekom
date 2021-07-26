@@ -10,6 +10,18 @@ class Tag(models.Model):
 		return self.name
 	# .files: ManyToManyField(Submission, related_name="tags")
 
+	@staticmethod
+	def name_to_id(tag):
+		"""Takes a tag name and returns its id. Creates a new tag if neccessary."""
+		queryset = Tag.objects.filter(name=tag)
+		if queryset.count() == 0:
+			t = Tag()
+			t.name = tag
+			t.save()
+			return t.id
+		else:
+			return queryset[0].id
+
 class Professor(models.Model):
 	first_name = models.CharField(max_length=50)
 	last_name = models.CharField(max_length=50)
@@ -53,7 +65,12 @@ class AuthCode(models.Model):
 	purpose = models.CharField(max_length=200)
 
 	def __str__(self):
-		return self.code
+		return self.code + " (" + ("unused" if self.used_file is None else self.used_file.title) + ")"
+
+	@property
+	def authoriser(self):
+		"""Full name of the authorising professor."""
+		return self.authorised_by.full_name
 
 	@staticmethod
 	def is_valid(code):
@@ -61,7 +78,7 @@ class AuthCode(models.Model):
 		ac = AuthCode.objects.filter(code=code)
 		if ac.count() != 1: return False
 		ac = ac[0]
-		return ac.used_datetime is None
+		return ac.used_file is None
 
 	@staticmethod
 	def is_available(code):
@@ -74,6 +91,7 @@ class AuthCode(models.Model):
 		ac = AuthCode.objects.get(code=code)
 		ac.used_datetime = datetime.now()
 		ac.used_file = submission
+		ac.save()
 
 	@staticmethod
 	def from_form_data(data):
@@ -84,7 +102,7 @@ class AuthCode(models.Model):
 		ac.authorised_by = Professor.objects.get(username=data['username'])
 		ac.purpose = data['purpose']
 		ac.save()
-		return ac.code
+		return ac
 
 class Year(models.IntegerChoices):
 	OTHER = 0, gettext_lazy("Vsi letniki / drugo")
@@ -106,7 +124,7 @@ Extensions = ["pdf", "docx", "txt", "odt", "png", "jpg", "gif", "jpeg", "zip", "
 class Submission(models.Model):
 	title = models.CharField(max_length=150)
 	subject = models.ForeignKey('Subject', on_delete=models.PROTECT)
-	professor = models.ForeignKey('Professor', on_delete=models.PROTECT)
+	professor = models.ForeignKey('Professor', on_delete=models.PROTECT, blank=True, null=True)
 	author = models.CharField(max_length=50)
 	year = models.IntegerField(choices=Year.choices, default=Year.OTHER)
 	type = models.IntegerField(choices=Type.choices, default=Type.OTHER)

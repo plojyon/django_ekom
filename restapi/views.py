@@ -1,31 +1,14 @@
-from rest_framework import viewsets
-from rest_framework import permissions
-
-#from django.contrib.auth.models import User, Group
-#from .serializers import UserSerializer, GroupSerializer
-
-#class UserViewSet(viewsets.ModelViewSet):
-#    """
-#    API endpoint that allows users to be viewed or edited.
-#    """
-#    queryset = User.objects.all().order_by('-date_joined')
-#    serializer_class = UserSerializer
-#    permission_classes = []#[permissions.IsAuthenticated]
-
-
-#class GroupViewSet(viewsets.ModelViewSet):
-#    """
-#    API endpoint that allows groups to be viewed or edited.
-#    """
-#    queryset = Group.objects.all()
-#    serializer_class = GroupSerializer
-#    permission_classes = []#[permissions.IsAuthenticated]
-
-from backend.models import Submission
-from .serializers import SubmissionSerializer
+from rest_framework import viewsets, generics, permissions, mixins
+from rest_framework.response import Response
+from backend.models import Submission, AuthCode
+from .serializers import SubmissionSerializer, AuthCodeSerializer
 
 class SubmissionViewSet(viewsets.ModelViewSet):
-    """API endpoint that lists all submissions."""
-    queryset = Submission.objects.all()
-    serializer_class = SubmissionSerializer
-    permission_classes = []
+	"""API endpoint that lists all submissions."""
+	queryset = Submission.objects.all()
+	serializer_class = SubmissionSerializer
+
+class AuthcodeViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
+	"""API endpoint that lists all authcodes."""
+	queryset = AuthCode.objects.all()
+	serializer_class = AuthCodeSerializer

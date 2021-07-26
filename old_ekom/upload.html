@@ -71,7 +71,7 @@
 				Za generiranje kode <a href="auth.html">klikni tukaj</a>.<br><br>
 				Vsa polja označena z * so obvezna.</p>
 			</details>
-			<form enctype="multipart/form-data" onsubmit="trim_tags()" action="services/upload.php" method="post">
+			<form action="http://127.0.0.1:8000/api/submissions/" enctype="multipart/form-data" method="post">
 				<div class="question">* Ime ali psevdonim:</div>
 				<input type="text" name="author" id="author_upload" class="answer" placeholder="Vili Čar" required><br>
 				<div class="question">* Izviren naslov:</div>
@@ -80,14 +80,14 @@
 				<input type="text" name="tags" id="tags_upload" class="answer" placeholder="vektorji,premice,tocka"><br>
 				<div class="question">* Vrsta objave:</div>
 				<select name="type" id="type_upload" class="answer" required>
-					<option selected="true">Zapiski</option>
-					<option>Test</option>
-					<option>Naloge</option>
-					<option>Laboratorijske vaje</option>
-					<option>Drugo</option>
+					<option value="1" selected="true">Zapiski</option>
+					<option value="2">Test</option>
+					<option value="3">Naloge</option>
+					<option value="4">Laboratorijske vaje</option>
+					<option value="0">Drugo</option>
 				</select><br>
 				<div class="question">Izberi letnik:</div>
-				<select name="letnik" id="letnik_upload" class="answer">
+				<select name="year" id="letnik_upload" class="answer">
 					<option selected="true" value="0">Vsi letniki / drugo</option>
 					<option value="1">1. Letnik</option>
 					<option value="2">2. Letnik</option>
@@ -95,23 +95,46 @@
 					<option value="4">4. Letnik</option>
 				</select><br>
 				<div class="question">Izberi profesorja:</div>
-				<select name="professor" id="professor_select" class="answer">
-					<option selected="true" value="">Brez profesorja</option>
-				</select><br>
+				<input class="answer" type="number" name="professor" value="1"><br>
 				<div class="question">* Izberi predmet:</div>
-				<select name="predmet" id="predmet_select" class="answer" required>
+				<select name="subject" id="predmet_select" class="answer" required>
 					<option selected="true" disabled="disabled">Predmet</option>
 				</select><br>
 				<div class="question">* Naloži datoteko (do 8 MB):</div>
 				<input type="file" name="file" id="file_upload" class="answer" onchange="findSize()" required><br>
 				<div class="question">* Koda za objavo: <sup><a onclick="document.getElementById('navodila').open = true;">[?]</a></sup></div>
-				<input type="password" name="code" id="coda_upload" class="answer" required><br>
+				<input type="password" name="authcode" id="coda_upload" class="answer" required><br>
 				<div id="submit_query">
 					<input type="submit" id="submit" value="Oddaj datoteko">
 					<input type="button" id="back" value="Nazaj" onclick="window.location.href='index.html';">
 				</div>
 				<br>
 			</form>
+			<script>
+				/*function sendRequest(e) {
+					e.preventDefault();
+					const xhttp = new XMLHttpRequest();
+					xhttp.onload = function() {
+						//resp = JSON.parse(this.responseText);
+						output = document.getElementById("form_header")
+						output.innerHTML = this.responseText;
+					}
+					xhttp.open("POST", "http://127.0.0.1:8000/api/submissions/");
+					xhttp.setRequestHeader("Content-Type", "application/json");
+					xhttp.send(JSON.stringify({
+						'author': document.getElementById("author_upload").value,
+						'title': document.getElementById("title_upload").value,
+						'tags': document.getElementById("tags_upload").value,
+						'type': document.getElementById("type_upload").value,
+						'year': document.getElementById("letnik_upload").value,
+						'professor': document.getElementById("professor_select").value,
+						'subject': document.getElementById("predmet_select").value,
+						'file': document.getElementById("file_upload").value,
+						'authcode': document.getElementById("coda_upload").value
+					}));
+				}
+				*/
+			</script>
 		</div>
 	</body>
 </html>

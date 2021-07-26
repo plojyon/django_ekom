@@ -68,7 +68,7 @@ def AuthcodeGenerator(request):
 		else:
 			try:
 				Professor.authenticate(form.cleaned_data['username'], form.cleaned_data['password'])
-				code = AuthCode.from_form_data(form.cleaned_data)
+				code = AuthCode.from_form_data(form.cleaned_data).code
 				success = "Uspeh! Koda: " + code
 			except Exception as e:
 				error = 'Napaka: ' + str(e)

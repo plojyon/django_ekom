@@ -9,16 +9,16 @@
 		<title>Generator avtorizacijskih kod</title>
 	</head>
 	<body>
-		<form action="services/auth.php" method="post" id="basic_form">
+		<form onsubmit="sendRequest(event)" id="basic_form">
 			<div id="form_header">
 				Generator avtorizacijskih kod
 			</div>
 			<div class="question">Uporabniško ime:</div>
-			<input type="password" name="uname" class="answer" placeholder="" required><br>
+			<input type="password" name="username" id="username" class="answer" placeholder="" required><br>
 			<div class="question">Geslo:</div>
-			<input type="password" name="pword" class="answer" placeholder="" required><br>
+			<input type="password" name="password" id="password" class="answer" placeholder="" required><br>
 			<div class="question">Komentar:</div>
-			<textarea rows="3" name="comment" class="answer" placeholder="komu je namenjena koda (obvezno) - ime priimek letnik" required></textarea><br>
+			<textarea rows="3" name="purpose" id="purpose" class="answer" placeholder="komu je namenjena koda (obvezno) - ime priimek letnik" required></textarea><br>
 			<br>
 			<div id="submit_query">
 				<input type="submit" id="submit" value="Generiraj kodo">
@@ -26,5 +26,26 @@
 			</div>
 			<br>
 		</form>
+		<script>
+			function sendRequest(e) {
+				e.preventDefault();
+				const xhttp = new XMLHttpRequest();
+				xhttp.onload = function() {
+					resp = JSON.parse(this.responseText);
+					output = document.getElementById("form_header")
+					if (resp["code"])
+						output.innerHTML = resp["code"];
+					else
+						output.innerHTML = resp;
+				}
+				xhttp.open("POST", "http://127.0.0.1:8000/api/authcodes/");
+				xhttp.setRequestHeader("Content-Type", "application/json");
+				xhttp.send(JSON.stringify({
+					'username': document.getElementById("username").value,
+					'password': document.getElementById("password").value,
+					'purpose': document.getElementById("purpose").value
+				}));
+			}
+		</script>
 	</body>
 </html>
