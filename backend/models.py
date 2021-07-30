@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy
 from datetime import datetime
+from django.utils.timezone import make_aware
 import random
 from django.conf import settings
 
@@ -108,7 +109,7 @@ class AuthCode(models.Model):
     def use(submission, code):
         """Uses the code on a submission."""
         ac = AuthCode.objects.get(code=code)
-        ac.used_datetime = datetime.now()
+        ac.used_datetime = make_aware(datetime.now())
         ac.used_file = submission
         ac.save()
 

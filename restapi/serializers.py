@@ -21,7 +21,7 @@ class SubmissionSerializer(serializers.Serializer):
     title = serializers.CharField(max_length=150)
     author = serializers.CharField(max_length=50)
     year = serializers.ChoiceField(choices=Year.choices, default=Year.OTHER)
-    professor = serializers.IntegerField(label="Professor id", required=False)
+    professor = serializers.IntegerField(label="Professor id")
     subject = serializers.CharField(max_length=10, label="Subject slug")
     tags = serializers.CharField(max_length=50, required=False)
     type = serializers.ChoiceField(choices=Type.choices, default=Type.OTHER)
@@ -45,6 +45,14 @@ class SubmissionSerializer(serializers.Serializer):
         sub = Submission.from_form_data(data)
         AuthCode.use(sub, data["authcode"])
         return sub
+
+    def validate_file(self, value):
+        try:
+            Submission.generate_filename(1, value.name)
+        except ValueError:
+            raise serializers.ValidationError("Invalid filename extension")
+        # I cannot set the new filename here, because we can't know the subject id
+        return value
 
     def validate_subject(self, value):
         if Subject.objects.filter(slug=value).count() != 1:

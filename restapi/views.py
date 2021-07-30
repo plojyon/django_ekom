@@ -7,7 +7,7 @@ from .serializers import SubmissionSerializer, AuthCodeSerializer
 class SubmissionViewSet(viewsets.ModelViewSet):
     """API endpoint that lists all submissions."""
 
-    queryset = Submission.objects.all()
+    queryset = Submission.objects.all().order_by("-pk")
     serializer_class = SubmissionSerializer
 
 
@@ -16,7 +16,7 @@ class AuthcodeViewSet(
 ):
     """API endpoint that lists all authcodes."""
 
-    queryset = AuthCode.objects.all()
+    queryset = AuthCode.objects.all().order_by("-pk")
     serializer_class = AuthCodeSerializer
 
 
