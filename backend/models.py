@@ -30,7 +30,7 @@ class Professor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     subjects = models.ManyToManyField("Subject", related_name="professors")
-    username = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=50)
 
     def __str__(self):
@@ -109,6 +109,8 @@ class AuthCode(models.Model):
     def use(submission, code):
         """Uses the code on a submission."""
         ac = AuthCode.objects.get(code=code)
+        if not submission:
+            raise ValueError("Cannot use code on null submission")
         ac.used_datetime = make_aware(datetime.now())
         ac.used_file = submission
         ac.save()
@@ -213,7 +215,7 @@ class Submission(models.Model):
 
         try:
             file_count = Submission.objects.filter(subject__id=subject_id).count()
-            subject_name = Subject.objects.get(pk=subject_id).name
+            subject_name = Subject.objects.get(pk=subject_id).slug
         except:
             raise ValueError("Subject does not exist")
 
