@@ -2,13 +2,74 @@ from django.db import models
 from django.utils.translation import gettext_lazy
 from datetime import datetime
 from django.utils.timezone import make_aware
+from django.db.models import Count
 import random
 from django.conf import settings
+
+
+class Year(models.IntegerChoices):
+    OTHER = 0, gettext_lazy("Vsi letniki / drugo")
+    FIRST = 1, gettext_lazy("1. letnik")
+    SECOND = 2, gettext_lazy("2. letnik")
+    THIRD = 3, gettext_lazy("3. letnik")
+    FOURTH = 4, gettext_lazy("4. letnik")
+
+
+class Type(models.IntegerChoices):
+    OTHER = 0, gettext_lazy("Drugo")
+    NOTES = 1, gettext_lazy("Zapiski")
+    EXAM = 2, gettext_lazy("Test")
+    PRACTICE = 3, gettext_lazy("Naloge")
+    LAB = 4, gettext_lazy("Laboratorijske vaje")
+
+
+# allowed file extensions (this can absolutely be spoofed)
+Extensions = [
+    "pdf",
+    "docx",
+    "txt",
+    "odt",
+    "png",
+    "jpg",
+    "gif",
+    "jpeg",
+    "zip",
+    "7z",
+    "pub",
+]
+
+icons = {
+    "Biologija": "fa fa-leaf",
+    "Jeziki": "fa fa-language",
+    "Filozofija": "far fa-lightbulb",
+    "Fizika": "fas fa-atom",
+    "Geografija": "fa fa-globe",
+    "Glasba": "fa fa-music",
+    "Informatika": "fa fa-code",
+    "Kemija": "fa fa-flask",
+    "Likovna": "fa fa-paint-brush",
+    "Matematika": "fas fa-square-root-alt",
+    "Pedagogika": "fas fa-chalkboard-teacher",
+    "Psihologija": "fas fa-brain",
+    "Slovenscina": "fas fa-book",
+    "Sociologija": "fas fa-user-friends",
+    "Sportna": "fa fa-futbol",
+    "Umetnostna zgo": "fa fa-landmark",
+    "Zgodovina": "fas fa-history",
+    "Neznan predmet": "fas fa-graduation-cap",
+}
+
+
+class TagManager(models.Manager):
+    def active(self):
+        """Only retrieve actively used tags (those with at least one submission)."""
+        return self.annotate(used_count=Count("files")).filter(used_count__gt=0)
 
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
     # .files: ManyToManyField(Submission, related_name="tags")
+    objects = TagManager()
 
     def __str__(self):
         return self.name
@@ -56,7 +117,14 @@ class Professor(models.Model):
 class Subject(models.Model):
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=10, unique=True)
-    icon = models.CharField(max_length=20, default="fa fa-language")
+    # icon = models.CharField(max_length=20, default="fa fa-language")
+
+    @property
+    def icon(self):
+        if self.name in icons:
+            return icons[self.name]
+        else:
+            return icons["Neznan predmet"]
 
     def __str__(self):
         return self.name
@@ -125,38 +193,6 @@ class AuthCode(models.Model):
         ac.purpose = data["purpose"]
         ac.save()
         return ac
-
-
-class Year(models.IntegerChoices):
-    OTHER = 0, gettext_lazy("Vsi letniki / drugo")
-    FIRST = 1, gettext_lazy("1. letnik")
-    SECOND = 2, gettext_lazy("2. letnik")
-    THIRD = 3, gettext_lazy("3. letnik")
-    FOURTH = 4, gettext_lazy("4. letnik")
-
-
-class Type(models.IntegerChoices):
-    OTHER = 0, gettext_lazy("Drugo")
-    NOTES = 1, gettext_lazy("Zapiski")
-    EXAM = 2, gettext_lazy("Test")
-    PRACTICE = 3, gettext_lazy("Naloge")
-    LAB = 4, gettext_lazy("Laboratorijske vaje")
-
-
-# allowed file extensions (this can absolutely be spoofed)
-Extensions = [
-    "pdf",
-    "docx",
-    "txt",
-    "odt",
-    "png",
-    "jpg",
-    "gif",
-    "jpeg",
-    "zip",
-    "7z",
-    "pub",
-]
 
 
 class Submission(models.Model):

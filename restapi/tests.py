@@ -7,8 +7,7 @@ import json
 
 
 class SubmissionTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
+    def setUp(self):
         mr_tester = Professor.objects.create(
             first_name="Mr.",
             last_name="Tester",

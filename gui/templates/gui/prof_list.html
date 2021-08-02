@@ -1,7 +1,7 @@
 <h1>Profesorji</h1>
 <ul>{% for p in professors.all %}
 	<li><a href="{{ p.pk }}">{{ p.full_name }}</a>
-		({% for sub in p.subjects.all %}<a href="{% url 'submissions_list' %}subjects/{{sub.slug}}">{{ sub.name }}</a>{% if not forloop.last %}, {% endif %}{% endfor %})
+		({% for sub in p.subjects.all %}{{ sub.name }}{% if not forloop.last %}, {% endif %}{% endfor %})
 	</li>
 {% endfor %}</ul>
 <a href="{% url 'submissions_list' %}">Nazaj</a>

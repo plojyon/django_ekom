@@ -56,7 +56,7 @@ class FilterForm(forms.Form):
         required=False,
     )
     tags = forms.MultipleChoiceField(
-        choices=[(t.id, t.name) for t in Tag.objects.all()],
+        choices=[(t.id, t.name) for t in Tag.objects.active()],
         label="Oznake (tags)",
         widget=my_widget,
         required=False,

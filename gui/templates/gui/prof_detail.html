@@ -2,7 +2,7 @@
 <b>Last name:</b> {{ professor.last_name }}<br>
 <b>Subjects:</b>
 	<ul>{% for subject in professor.subjects.all %}
-		<li><a href="{% url 'submissions_list' %}subjects/{{ subject.pk }}">{{ subject.name }}</a></li>
+		<li>{{ subject.name }}</li>
 	{% endfor %}</ul>
 <b>Authorised codes:</b>
 	<ul>{% for code in professor.auth_codes.all %}
@@ -11,7 +11,7 @@
 			{% if code.is_valid %}
 				(unused)
 			{% else %}
-				(Used for: <a href="{% url 'submissions_list' %}files/{{ code.used_file.id }}">{{ code.used_file.name }}</a> @ {{ code.used_datetime }})
+				(Used for: {{ code.used_file.title }} @ {{ code.used_datetime }})
 			{% endif %}
 		</li>
 	{% endfor %}</ul>
