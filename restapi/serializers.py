@@ -1,52 +1,43 @@
 from rest_framework import serializers
-
-# from django.contrib.auth.models import User, Group
-
-# class UserSerializer(serializers.HyperlinkedModelSerializer):
-#    class Meta:
-#        model = User
-#        fields = ['url', 'username', 'email', 'groups']
-
-
-# class GroupSerializer(serializers.HyperlinkedModelSerializer):
-#    class Meta:
-#        model = Group
-# 		fields = ['url', 'name']
-
 from backend.models import Submission, AuthCode, Professor, Year, Subject, Tag, Type
 
 
-class SubmissionSerializer(serializers.Serializer):
-    file = serializers.FileField()
-    title = serializers.CharField(max_length=150)
-    author = serializers.CharField(max_length=50)
-    year = serializers.ChoiceField(choices=Year.choices, default=Year.OTHER)
-    professor = serializers.IntegerField(label="Professor id")
-    subject = serializers.CharField(max_length=10, label="Subject slug")
-    tags = serializers.CharField(max_length=50, required=False)
-    type = serializers.ChoiceField(choices=Type.choices, default=Type.OTHER)
-    authcode = serializers.CharField(max_length=50)
+class SubmissionSerializer(serializers.ModelSerializer):
+    authcode = serializers.SlugRelatedField(
+        slug_field="code", queryset=AuthCode.objects.all(), source="auth_code"
+    )
+    professor = serializers.SlugRelatedField(
+        slug_field="id", queryset=Professor.objects.all()
+    )
+    subject = serializers.SlugRelatedField(
+        slug_field="slug", queryset=Subject.objects.all()
+    )
+    tags = serializers.CharField(source="tags_arr")
 
-    def to_representation(self, instance):
-        return {
-            "title": instance.title,
-            "author": instance.author,
-            "year": instance.year,
-            "professor": instance.professor.full_name,
-            "subject": instance.subject.slug,
-            "tags": instance.tags_arr,
-            "type": instance.type_name,
-            "url": instance.url,
-        }
+    class Meta:
+        model = Submission
+        fields = [
+            "title",
+            "author",
+            "year",
+            "professor",
+            "subject",
+            "tags",
+            "type",
+            "file",
+            "authcode",
+        ]
 
     def create(self, data):
+        """Set default values for unset fields and create object."""
         if "tags" not in data:
             data["tags"] = []
+        AuthCode.use(sub, data["auth_code"])
         sub = Submission.from_form_data(data)
-        AuthCode.use(sub, data["authcode"])
         return sub
 
     def validate_file(self, value):
+        print("Validating file:", value)
         try:
             Submission.generate_filename(1, value.name)
         except ValueError:
@@ -54,54 +45,59 @@ class SubmissionSerializer(serializers.Serializer):
         # I cannot set the new filename here, because we can't know the subject id
         return value
 
+    # For backwards compatibilty with old javascript code, Submission.from_form_data
+    # will only accept the ids of foreign relations
     def validate_subject(self, value):
-        if Subject.objects.filter(slug=value).count() != 1:
-            raise serializers.ValidationError("Invalid subject slug: " + str(value))
-        # slug -> id
-        return Subject.objects.get(slug=value).id
+        return value.id
 
     def validate_professor(self, value):
-        if Professor.objects.filter(pk=value).count() != 1:
-            raise serializers.ValidationError("Invalid professor id: " + str(value))
-        return value
+        return value.id
 
     def validate_tags(self, value):
+        """Transform a comma-separated list of tags into an array of tag ids."""
         tags = value.split(",")
         tag_ids = []
         for tag in tags:
             new_tag = tag.strip()
             if new_tag != "":
-                id = Tag.object.get_or_create(name=new_tag).id
+                id = Tag.objects.get_or_create(name=new_tag)[0].id
                 tag_ids.append(id)
+        print("Validated tags into:", tag_ids)
         return tag_ids
 
     def validate_authcode(self, value):
-        if not AuthCode.is_valid(value):
-            raise serializers.ValidationError("Invalid authcode: " + str(value))
-        return value
+        if not AuthCode.is_valid(value.code):
+            raise serializers.ValidationError("Invalid authcode: " + str(value.code))
+        return value.code
 
 
-class AuthCodeSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=50)
-    password = serializers.CharField(max_length=50)
-    purpose = serializers.CharField(max_length=200)
+class AuthCodeSerializer(serializers.ModelSerializer):
+    authorised_by = serializers.SlugRelatedField(
+        slug_field="username", queryset=Professor.objects.all()
+    )
+    used_file = serializers.StringRelatedField(read_only=True)
+    password = serializers.CharField(max_length=50, write_only=True)
 
-    def to_representation(self, instance):
-        return {
-            "code": instance.code,
-            "purpose": instance.purpose,
-            "authorised_by": instance.authorised_by.full_name,
-            "authorised_datetime": instance.authorised_datetime,
-            "used_file": instance.used_file.title if instance.used_file else None,
-            "used_datetime": instance.used_datetime,
-        }
+    class Meta:
+        model = AuthCode
+        fields = [
+            "code",
+            "purpose",
+            "authorised_by",
+            "authorised_datetime",
+            "used_file",
+            "used_datetime",
+            "password",
+        ]
+        read_only_fields = [
+            "code",
+            "used_datetime",
+        ]  # + ["used_file"] (already declared read-only)
 
     def create(self, data):
+        data["username"] = data["authorised_by"].username
         try:
             Professor.authenticate(data["username"], data["password"])
         except:
             raise serializers.ValidationError("Invalid credentials")
         return AuthCode.from_form_data(data)
-
-    def update(self):
-        raise NotImplementedError("ne gre sori")
