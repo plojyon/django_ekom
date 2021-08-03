@@ -149,7 +149,7 @@ class SubmissionTestCase(TestCase):
             "year": 3,
             "type": 4,
             "tags": [
-                Tag.name_to_id(name)
+                Tag.objects.get_or_create(name=name)[0].id
                 for name in ["a", "b", "c", "123", "\\/@@!&#", "+_=``"]
             ],
             "file": upload_file,
@@ -162,20 +162,3 @@ class SubmissionTestCase(TestCase):
         self.assertEquals(s.year_name, "3. letnik")
         self.assertEquals(s.type_name, "Laboratorijske vaje")
         self.assertEquals(len(s.tags_arr), len(set(s.tags_arr)))
-
-
-class TagTestCase(TestCase):
-    def setUp(self):
-        pass
-
-    def test_name_to_id(self):
-        self.assertEquals(Tag.objects.count(), 0)
-        for i in range(23):
-            id = Tag.name_to_id("tag #" + str(i))
-            self.assertEquals(Tag.objects.get(name="tag #" + str(i)).id, id)
-        self.assertEquals(Tag.objects.count(), 23)
-        for i in range(23):
-            id = Tag.name_to_id("tag #" + str(i))
-            self.assertEquals(Tag.objects.get(name="tag #" + str(i)).id, id)
-        self.assertEquals(Tag.objects.count(), 23)
-        self.assertEquals(Tag.objects.get(pk=1).__str__(), "tag #0")

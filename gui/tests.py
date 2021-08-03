@@ -96,10 +96,10 @@ class SubmissionsViewTestCase(TestCase):
     def test_only_display_active_tag_filters(self):
         # unused tags
         for i in range(23):
-            Tag.name_to_id("tag #" + str(i))
+            Tag.objects.get_or_create(name="tag #" + str(i))
         # used tags
         tags = [
-            Tag.name_to_id(name)
+            Tag.objects.get_or_create(name=name)[0]
             for name in [
                 "tag-aass",
                 "tag-bssb",

@@ -74,18 +74,6 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
-    @staticmethod
-    def name_to_id(tag):
-        """Takes a tag name and returns its id. Creates a new tag if neccessary."""
-        queryset = Tag.objects.filter(name=tag)
-        if queryset.count() == 0:
-            t = Tag()
-            t.name = tag
-            t.save()
-            return t.id
-        else:
-            return queryset[0].id
-
 
 class Professor(models.Model):
     first_name = models.CharField(max_length=50)

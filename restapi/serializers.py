@@ -71,7 +71,7 @@ class SubmissionSerializer(serializers.Serializer):
         for tag in tags:
             new_tag = tag.strip()
             if new_tag != "":
-                id = Tag.name_to_id(new_tag)
+                id = Tag.object.get_or_create(name=new_tag).id
                 tag_ids.append(id)
         return tag_ids
 
