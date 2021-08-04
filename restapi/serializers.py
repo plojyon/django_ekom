@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from backend.models import Submission, AuthCode, Professor, Year, Subject, Tag, Type
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
@@ -71,10 +73,19 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return value.code
 
 
-class AuthCodeSerializer(serializers.ModelSerializer):
-    authorised_by = serializers.SlugRelatedField(
-        slug_field="username", queryset=Professor.objects.all()
+class ProfessorSerializer(serializers.ModelSerializer):
+    username = serializers.SlugRelatedField(
+        slug_field="username", source="user", queryset=User.objects.all()
     )
+
+    class Meta:
+        model = Professor
+        fields = ["username", "first_name", "last_name"]
+        read_only_fields = ["first_name", "last_name"]
+
+
+class AuthCodeSerializer(serializers.ModelSerializer):
+    authorised_by = ProfessorSerializer()
     used_file = serializers.StringRelatedField(read_only=True)
     password = serializers.CharField(max_length=50, write_only=True)
 
@@ -95,9 +106,7 @@ class AuthCodeSerializer(serializers.ModelSerializer):
         ]  # + ["used_file"] (already declared read-only)
 
     def create(self, data):
-        data["username"] = data["authorised_by"].username
-        try:
-            Professor.authenticate(data["username"], data["password"])
-        except:
+        data["username"] = data["authorised_by"]["user"].username
+        if authenticate(username=data["username"], password=data["password"]) is None:
             raise serializers.ValidationError("Invalid credentials")
         return AuthCode.from_form_data(data)

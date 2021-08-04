@@ -4,6 +4,7 @@ from django.views import generic
 from backend.models import Submission, Professor, Year, Type, AuthCode
 from .forms import UploadFileForm, FilterForm, AuthcodeGeneratorForm
 from django.db.models import Q
+from django.contrib.auth import authenticate
 
 
 def SubmissionsList(request):
@@ -71,14 +72,15 @@ def AuthcodeGenerator(request):
         if not form.is_valid():
             error = "Invalid form data"
         else:
-            try:
-                Professor.authenticate(
-                    form.cleaned_data["username"], form.cleaned_data["password"]
-                )
+            user = authenticate(
+                username=form.cleaned_data["username"],
+                password=form.cleaned_data["password"],
+            )
+            if user is not None:
                 code = AuthCode.from_form_data(form.cleaned_data).code
                 success = "Uspeh! Koda: " + code
-            except Exception as e:
-                error = "Napaka: " + str(e)
+            else:
+                error = "Invalid credentials"
 
     return render(
         request,

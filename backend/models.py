@@ -5,6 +5,7 @@ from django.utils.timezone import make_aware
 from django.db.models import Count
 import random
 from django.conf import settings
+from django.contrib.auth.models import User
 
 
 class Year(models.IntegerChoices):
@@ -38,27 +39,6 @@ Extensions = [
     "pub",
 ]
 
-icons = {
-    "Biologija": "fa fa-leaf",
-    "Jeziki": "fa fa-language",
-    "Filozofija": "far fa-lightbulb",
-    "Fizika": "fas fa-atom",
-    "Geografija": "fa fa-globe",
-    "Glasba": "fa fa-music",
-    "Informatika": "fa fa-code",
-    "Kemija": "fa fa-flask",
-    "Likovna": "fa fa-paint-brush",
-    "Matematika": "fas fa-square-root-alt",
-    "Pedagogika": "fas fa-chalkboard-teacher",
-    "Psihologija": "fas fa-brain",
-    "Slovenscina": "fas fa-book",
-    "Sociologija": "fas fa-user-friends",
-    "Sportna": "fa fa-futbol",
-    "Umetnostna zgo": "fa fa-landmark",
-    "Zgodovina": "fas fa-history",
-    "Neznan predmet": "fas fa-graduation-cap",
-}
-
 
 class TagManager(models.Manager):
     def active(self):
@@ -68,7 +48,7 @@ class TagManager(models.Manager):
 
 class Tag(models.Model):
     name = models.CharField(max_length=50)
-    # .files: ManyToManyField(Submission, related_name="tags")
+    # Related field: .files: ManyToManyField(Submission, related_name="tags")
     objects = TagManager()
 
     def __str__(self):
@@ -79,8 +59,7 @@ class Professor(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     subjects = models.ManyToManyField("Subject", related_name="professors")
-    username = models.CharField(max_length=50, unique=True)
-    password = models.CharField(max_length=50)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.full_name
@@ -89,30 +68,11 @@ class Professor(models.Model):
     def full_name(self):
         return self.first_name + " " + self.last_name
 
-    @staticmethod
-    def authenticate(uname, pw):
-        """Asserts professor uname exists and password matches.
-        Returns True or raises Exception."""
-        p = Professor.objects.filter(username=uname)
-        if p.count() != 1:
-            raise ValueError("Professor does not exist")
-        p = p[0]
-        if p.password != pw:
-            raise ValueError("Incorrect password")
-        return True
-
 
 class Subject(models.Model):
     name = models.CharField(max_length=50)
     slug = models.CharField(max_length=10, unique=True)
-    # icon = models.CharField(max_length=20, default="fa fa-language")
-
-    @property
-    def icon(self):
-        if self.name in icons:
-            return icons[self.name]
-        else:
-            return icons["Neznan predmet"]
+    icon = models.CharField(max_length=20, default="fas fa-graduation-cap")
 
     def __str__(self):
         return self.name
@@ -177,7 +137,7 @@ class AuthCode(models.Model):
         ac = AuthCode()
         # *probably* won't have a conflict ....
         ac.code = hex(random.randint(10000000000, 99999999999))
-        ac.authorised_by = Professor.objects.get(username=data["username"])
+        ac.authorised_by = Professor.objects.get(user__username=data["username"])
         ac.purpose = data["purpose"]
         ac.save()
         return ac

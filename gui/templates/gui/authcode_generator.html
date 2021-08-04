@@ -1,7 +1,6 @@
 <h1>Get authcode</h1>
 {% if error != "" %}<b style="color:red">{{ error }} <a href=".">Clear</a></b>{% endif %}
 {% if success != "" %}<b style="color:green">{{ success }} <a href=".">Clear</a></b>{% endif %}
-<p>Debugging hint: profesor plojyon je na mizi pustil listek, na katerem pise Solata123</p>
 <form action="." method="post" enctype="multipart/form-data">
 	{% csrf_token %}
 	{{ form }}
