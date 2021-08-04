@@ -160,11 +160,6 @@ class Submission(models.Model):
         return self.title
 
     @property
-    def tags_arr(self):
-        """Array of tags on this submission."""
-        return [tag.name for tag in self.tags.all()]
-
-    @property
     def prof_name(self):
         """Professor's full name."""
         return self.professor.full_name

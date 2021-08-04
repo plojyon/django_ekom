@@ -4,17 +4,40 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 
+class ProfessorSerializer(serializers.ModelSerializer):
+    username = serializers.SlugRelatedField(
+        slug_field="username", source="user", queryset=User.objects.all()
+    )
+
+    class Meta:
+        model = Professor
+        fields = ["username", "first_name", "last_name"]
+        read_only_fields = ["first_name", "last_name"]
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+
+    def to_representation(self, value):
+        return value.name
+
+
 class SubmissionSerializer(serializers.ModelSerializer):
     authcode = serializers.SlugRelatedField(
         slug_field="code", queryset=AuthCode.objects.all(), source="auth_code"
     )
-    professor = serializers.SlugRelatedField(
-        slug_field="id", queryset=Professor.objects.all()
-    )
+    # professor = serializers.SlugRelatedField(
+    #    slug_field="id", queryset=Professor.objects.all()
+    # )
+    professor = ProfessorSerializer()
     subject = serializers.SlugRelatedField(
         slug_field="slug", queryset=Subject.objects.all()
     )
-    tags = serializers.CharField(source="tags_arr")
+    tags_writeonly = serializers.CharField(
+        write_only=True, label="Tags"  # input field (charfield)
+    )
+    tags = TagSerializer(many=True, read_only=True)  # display (list field)
 
     class Meta:
         model = Submission
@@ -24,6 +47,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "year",
             "professor",
             "subject",
+            "tags_writeonly",
             "tags",
             "type",
             "file",
@@ -32,10 +56,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
 
     def create(self, data):
         """Set default values for unset fields and create object."""
-        if "tags" not in data:
+        if "tags_writeonly" not in data:
             data["tags"] = []
-        AuthCode.use(sub, data["auth_code"])
+        else:
+            data["tags"] = data["tags_writeonly"]
         sub = Submission.from_form_data(data)
+        AuthCode.use(sub, data["auth_code"])
         return sub
 
     def validate_file(self, value):
@@ -53,9 +79,9 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return value.id
 
     def validate_professor(self, value):
-        return value.id
+        return value["user"].id
 
-    def validate_tags(self, value):
+    def validate_tags_writeonly(self, value):
         """Transform a comma-separated list of tags into an array of tag ids."""
         tags = value.split(",")
         tag_ids = []
@@ -71,17 +97,6 @@ class SubmissionSerializer(serializers.ModelSerializer):
         if not AuthCode.is_valid(value.code):
             raise serializers.ValidationError("Invalid authcode: " + str(value.code))
         return value.code
-
-
-class ProfessorSerializer(serializers.ModelSerializer):
-    username = serializers.SlugRelatedField(
-        slug_field="username", source="user", queryset=User.objects.all()
-    )
-
-    class Meta:
-        model = Professor
-        fields = ["username", "first_name", "last_name"]
-        read_only_fields = ["first_name", "last_name"]
 
 
 class AuthCodeSerializer(serializers.ModelSerializer):

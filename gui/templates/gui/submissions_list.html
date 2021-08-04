@@ -10,7 +10,7 @@
 	<li>
 		<a href="{{ f.url }}"><b>{{ f.title }}</b></a>
 		by {{ f.author }}
-		({{ f.tags_arr|join:", " }})
+		({{ f.tags.all|join:", " }})
 	</li>
 {% endfor %}</ul>
 -->
@@ -85,7 +85,7 @@
 					<div class="submission_text">
 						<span class="submission_title">{{ f.title }}</span>
 						<p class="tags">
-							{% for tag in f.tags_arr %}
+							{% for tag in f.tags.all %}
 								<span class="tag">{{ tag }}</span>
 							{% endfor%}
 						</p>
