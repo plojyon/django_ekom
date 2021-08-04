@@ -6,6 +6,7 @@ from django.db.models import Count
 import random
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
 
 
 class Year(models.IntegerChoices):
@@ -134,9 +135,15 @@ class AuthCode(models.Model):
     @staticmethod
     def from_form_data(data):
         """Create an AuthCode object from data returned by AuthCodeForm."""
+        code = None
+        while code is None or not AuthCode.is_available(code=code):
+            code = get_random_string(
+                length=8,
+                # all alphanumeric chars except ambiguous ones (0, O, 1, i, l)
+                allowed_chars="23456789ABCDEFGHJKMNPQRSTUVWXYZ",
+            )
         ac = AuthCode()
-        # *probably* won't have a conflict ....
-        ac.code = hex(random.randint(10000000000, 99999999999))
+        ac.code = code
         ac.authorised_by = Professor.objects.get(user__username=data["username"])
         ac.purpose = data["purpose"]
         ac.save()
