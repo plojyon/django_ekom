@@ -45,6 +45,8 @@ class SubmissionSerializer(serializers.ModelSerializer):
     def create(self, data):
         """Create the submission and use the authcode."""
         data["tags"] = data["tags_writeonly"]  # alias
+        data["professor"] = data["professor"]["user"]["username"]
+        data["auth_code"] = data["auth_code"]["code"]
         sub = Submission.from_form_data(data)
         AuthCode.use(sub, data["auth_code"])
         return sub
@@ -54,6 +56,9 @@ class SubmissionSerializer(serializers.ModelSerializer):
             Submission.generate_filename(1, value.name)
         except ValueError:
             raise serializers.ValidationError("Invalid filename extension")
+        except AttributeError:
+            raise serializers.ValidationError("File has no name")
+
         # I cannot set the new filename here, because we can't know the subject id
         return value
 
@@ -115,7 +120,7 @@ class AuthCodeSerializer(serializers.ModelSerializer):
         ]  # + ["used_file"] (already declared read-only)
 
     def create(self, data):
-        data["username"] = data["authorised_by"]["user"].username
+        data["username"] = data["authorised_by"]["user"]["username"]
         if authenticate(username=data["username"], password=data["password"]) is None:
             raise serializers.ValidationError("Invalid credentials")
         return AuthCode.from_form_data(data)
