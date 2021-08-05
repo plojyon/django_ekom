@@ -15,7 +15,9 @@ class TagSerializer(serializers.ModelSerializer):
 
 class SubmissionSerializer(serializers.ModelSerializer):
     authcode = serializers.CharField(source="auth_code.code")
-    professor = serializers.CharField(source="professor.user.username")
+    professor = serializers.CharField(
+        source="professor.user.username", label="Professor username"
+    )
     subject = serializers.SlugRelatedField(
         slug_field="slug", queryset=Subject.objects.all()
     )
@@ -61,7 +63,12 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return value.id
 
     def validate_professor(self, value):
-        return value["user"].id
+        profs = Professor.objects.filter(user__username=value)
+        if profs.count() != 1:
+            raise serializers.ValidationError(
+                "Professor {pk} does not exist".format(pk=value)
+            )
+        return profs[0].id
 
     def validate_tags_writeonly(self, value):
         """Transform a comma-separated list of tags into an array of tag ids."""
@@ -75,9 +82,11 @@ class SubmissionSerializer(serializers.ModelSerializer):
         return tag_ids
 
     def validate_authcode(self, value):
-        if not AuthCode.is_valid(value.code):
-            raise serializers.ValidationError("Invalid authcode: " + str(value.code))
-        return value.code
+        if not AuthCode.is_valid(value):
+            raise serializers.ValidationError(
+                'Invalid authcode "{code}"'.format(code=value)
+            )
+        return value
 
 
 class AuthCodeSerializer(serializers.ModelSerializer):
