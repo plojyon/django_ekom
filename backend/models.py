@@ -173,11 +173,6 @@ class Submission(models.Model):
         return self.subject.slug
 
     @property
-    def url(self):
-        """Download link to the resource."""
-        return settings.MEDIA_URL + self.file.name
-
-    @property
     def type_name(self):
         """Self.type, but resolved as a string."""
         return Type(self.type).label

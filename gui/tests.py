@@ -3,6 +3,7 @@ from backend.models import Submission, Professor, Tag, Subject
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files import File
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 
 def create_dummy_submission(
@@ -32,16 +33,9 @@ def create_filter_string(filters):
 
 class FiltersTestCase(TestCase):
     def setUp(self):
-        sub = Subject(name="Test subject", slug="test")
-        sub.save()
-        prof = Professor(
-            first_name="Mr.",
-            last_name="Tester",
-            username="mrtester",
-            password="********",
-        )
-        prof.save()
-        prof.subjects.add(sub)
+        user = User.objects.create_user(username="mrtester", password="********")
+        prof = Professor.objects.create(first_name="Mr.", last_name="Tester", user=user)
+        prof.subjects.add(Subject.objects.create(name="Test subject", slug="test"))
         create_dummy_submission(title="test-submission-ena", year=1)
         create_dummy_submission(title="test-submission-dva", year=2)
 
@@ -74,16 +68,9 @@ class FiltersTestCase(TestCase):
 
 class SubmissionsViewTestCase(TestCase):
     def setUp(self):
-        sub = Subject(name="Test subject", slug="test")
-        sub.save()
-        prof = Professor(
-            first_name="Mr.",
-            last_name="Tester",
-            username="mrtester",
-            password="********",
-        )
-        prof.save()
-        prof.subjects.add(sub)
+        user = User.objects.create_user(username="mrtester", password="********")
+        prof = Professor.objects.create(first_name="Mr.", last_name="Tester", user=user)
+        prof.subjects.add(Subject.objects.create(name="Test subject", slug="test"))
 
     def test_empty_submissions_list(self):
         response = self.client.get(reverse("submissions_list"))
@@ -99,7 +86,7 @@ class SubmissionsViewTestCase(TestCase):
             Tag.objects.get_or_create(name="tag #" + str(i))
         # used tags
         tags = [
-            Tag.objects.get_or_create(name=name)[0]
+            Tag.objects.get_or_create(name=name)[0].id
             for name in [
                 "tag-aass",
                 "tag-bssb",

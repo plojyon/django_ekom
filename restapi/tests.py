@@ -8,31 +8,30 @@ import json
 
 class SubmissionTestCase(TestCase):
     def setUp(self):
-        mr_tester = Professor.objects.create(
-            first_name="Mr.",
-            last_name="Tester",
-            # subjects,
-            username="test",
-            password="********",
-        )
+        user = User.objects.create_user(username="mrtester", password="********")
+        prof = Professor.objects.create(first_name="Mr.", last_name="Tester", user=user)
         test = Subject.objects.create(name="Test Subject", slug="test")
-        mr_tester.subjects.add(test)
+        prof.subjects.add(test)
         AuthCode.objects.create(
             code="this is a valid authcode",
-            authorised_by=mr_tester,
+            authorised_by=prof,
             purpose="testing purposes",
         )
 
     def test_create_authcode(self):
         client = APIClient()
-        data = {"username": "test", "password": "********", "purpose": "some purpose"}
+        data = {
+            "authorised_by": "mrtester",
+            "password": "********",
+            "purpose": "some purpose",
+        }
         response = client.post("/api/authcodes/", data, format="json")
         self.assertEqual(response.status_code, 201)
 
     def test_auth_failure(self):
         client = APIClient()
         data = {
-            "username": "mallory",
+            "authorised_by": "mallory",
             "password": "' or DROP TABLE users;--",
             "purpose": "some purpose",
         }
@@ -42,7 +41,7 @@ class SubmissionTestCase(TestCase):
     def test_authcode_without_purpose(self):
         client = APIClient()
         data = {
-            "username": "test",
+            "authorised_by": "test",
             "password": "********",
             "purpose": "",
         }
@@ -60,7 +59,7 @@ class SubmissionTestCase(TestCase):
             "title": "My title",
             "author": "mr_tester",
             "year": "2",
-            "professor": "1",
+            "professor": "mrtester",
             "subject": "test",
             "tags": "",
             "type": "1",
@@ -84,7 +83,7 @@ class SubmissionTestCase(TestCase):
             "title": "My title",
             "author": "mr_tester",
             "year": "2",
-            "professor": "1",
+            "professor": "mrtester",
             "subject": "test",
             "tags": "",
             "type": "1",
@@ -104,7 +103,7 @@ class SubmissionTestCase(TestCase):
             "title": "My title",
             "author": "mr_tester",
             "year": "2",
-            "professor": "1",
+            "professor": "mrtester",
             "subject": "test",
             "tags": "",
             "type": "1",
@@ -125,7 +124,7 @@ class SubmissionTestCase(TestCase):
             "title": "My title",
             "author": "mr_tester",
             "year": "2",
-            "professor": "1",
+            "professor": "mrtester",
             "subject": "test",
             "tags": "",
             "type": "1",
@@ -163,7 +162,7 @@ class SubmissionTestCase(TestCase):
             "title": "My title",
             "author": "mr_tester",
             "year": "2",
-            "professor": "1",
+            "professor": "mrtester",
             "subject": "test",
             "tags": "",
             "type": "1",
