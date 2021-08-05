@@ -81,9 +81,11 @@ class SubmissionSerializer(serializers.ModelSerializer):
 
 
 class AuthCodeSerializer(serializers.ModelSerializer):
-    authorised_by = serializers.CharField(source="authorised_by.user.username")
+    authorised_by = serializers.CharField(
+        source="authorised_by.user.username", label="Username"
+    )
     used_file = serializers.HyperlinkedRelatedField(
-        view_name="submission-detail", queryset=Submission.objects.all()
+        view_name="submission-detail", read_only=True
     )
     password = serializers.CharField(max_length=50, write_only=True)
 
