@@ -4,17 +4,6 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
 
-class ProfessorSerializer(serializers.ModelSerializer):
-    username = serializers.SlugRelatedField(
-        slug_field="username", source="user", queryset=User.objects.all()
-    )
-
-    class Meta:
-        model = Professor
-        fields = ["username", "first_name", "last_name"]
-        read_only_fields = ["first_name", "last_name"]
-
-
 class TagSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tag
@@ -24,10 +13,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
-    authcode = serializers.SlugRelatedField(
-        slug_field="code", queryset=AuthCode.objects.all(), source="auth_code"
-    )
-    professor = ProfessorSerializer()
+    authcode = serializers.CharField(source="auth_code.code")
+    professor = serializers.CharField(source="professor.user.username")
     subject = serializers.SlugRelatedField(
         slug_field="slug", queryset=Subject.objects.all()
     )
@@ -92,7 +79,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
 
 
 class AuthCodeSerializer(serializers.ModelSerializer):
-    authorised_by = ProfessorSerializer()
+    authorised_by = serializers.CharField(source="authorised_by.user.username")
     used_file = serializers.StringRelatedField(read_only=True)
     password = serializers.CharField(max_length=50, write_only=True)
 
