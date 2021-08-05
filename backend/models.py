@@ -1,4 +1,4 @@
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy
 from datetime import datetime
 from django.utils.timezone import make_aware
@@ -121,9 +121,9 @@ class AuthCode(models.Model):
     @staticmethod
     def use(submission, code):
         """Uses the code on a submission."""
-        ac = AuthCode.objects.get(code=code)
         if not submission:
             raise ValueError("Cannot use code on null submission")
+        ac = AuthCode.objects.get(code=code)
         ac.used_datetime = make_aware(datetime.now())
         ac.used_file = submission
         ac.save()
@@ -138,12 +138,12 @@ class AuthCode(models.Model):
                 # all alphanumeric chars except ambiguous ones (0, O, 1, i, l)
                 allowed_chars="23456789ABCDEFGHJKMNPQRSTUVWXYZ",
             )
-        ac = AuthCode()
-        ac.code = code
-        ac.authorised_by = Professor.objects.get(user__username=data["username"])
-        ac.purpose = data["purpose"]
-        ac.save()
-        return ac
+
+        return AuthCode.objects.create(
+            code=code,
+            authorised_by=Professor.objects.get(user__username=data["username"]),
+            purpose=data["purpose"],
+        )
 
 
 class Submission(models.Model):
@@ -206,36 +206,29 @@ class Submission(models.Model):
         )
 
     @staticmethod
+    @transaction.atomic
     def from_form_data(data):
-        """Create a Submission object from data returned by UploadForm."""
-        s = Submission()
-        new_filename = Submission.generate_filename(data["subject"], data["file"].name)
+        """Create a Submission object from data returned by UploadForm.
 
-        s.title = data["title"]
+        :param data: Validated form data as returned by UploadFileForm
+        """
 
-        try:
-            sub = Subject.objects.get(pk=data["subject"])
-            s.subject = sub
-        except:
-            raise ValueError("Subject does not exist.")
+        data["file"].name = Submission.generate_filename(
+            data["subject"], data["file"].name
+        )
 
-        try:
-            prof = Professor.objects.get(pk=data["professor"])
-            s.professor = prof
-        except Exception as e:
-            raise ValueError("Professor does not exist: " + str(e))
-
-        s.author = data["author"]
-        s.year = Year(int(data["year"]))
-        s.type = data["type"]
-
-        s.save()  # needs to have a value for field "id" before many-to-many relationship can be used
+        s = Submission.objects.create(
+            title=data["title"],
+            subject=Subject.objects.get(pk=data["subject"]),
+            professor=Professor.objects.get(pk=data["professor"]),
+            author=data["author"],
+            year=Year(int(data["year"])),
+            type=data["type"],
+            file=data["file"],
+        )
+        # Submission needs to have a value for field "id" before many-to-many relationship can be used
         for t in data["tags"]:
             tag = Tag.objects.get(pk=t)
             s.tags.add(tag)
-
-        s.file = data["file"]
-        s.file.name = new_filename
-        s.save()
 
         return s

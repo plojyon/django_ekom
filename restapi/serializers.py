@@ -2,6 +2,7 @@ from rest_framework import serializers
 from backend.models import Submission, AuthCode, Professor, Year, Subject, Tag, Type
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db import transaction
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -38,6 +39,7 @@ class SubmissionSerializer(serializers.ModelSerializer):
             "authcode",
         ]
 
+    @transaction.atomic
     def create(self, data):
         """Create the submission and use the authcode."""
         data["tags"] = data["tags_writeonly"]  # alias
