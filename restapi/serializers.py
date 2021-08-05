@@ -20,22 +20,19 @@ class TagSerializer(serializers.ModelSerializer):
         model = Tag
 
     def to_representation(self, value):
-        return value.name
+        return value.name  # instead of {"name": value.name}
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
     authcode = serializers.SlugRelatedField(
         slug_field="code", queryset=AuthCode.objects.all(), source="auth_code"
     )
-    # professor = serializers.SlugRelatedField(
-    #    slug_field="id", queryset=Professor.objects.all()
-    # )
     professor = ProfessorSerializer()
     subject = serializers.SlugRelatedField(
         slug_field="slug", queryset=Subject.objects.all()
     )
     tags_writeonly = serializers.CharField(
-        write_only=True, label="Tags"  # input field (charfield)
+        write_only=True, label="Tags", default=""  # input field (charfield)
     )
     tags = TagSerializer(many=True, read_only=True)  # display (list field)
 
@@ -55,17 +52,13 @@ class SubmissionSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, data):
-        """Set default values for unset fields and create object."""
-        if "tags_writeonly" not in data:
-            data["tags"] = []
-        else:
-            data["tags"] = data["tags_writeonly"]
+        """Create the submission and use the authcode."""
+        data["tags"] = data["tags_writeonly"]  # alias
         sub = Submission.from_form_data(data)
         AuthCode.use(sub, data["auth_code"])
         return sub
 
     def validate_file(self, value):
-        print("Validating file:", value)
         try:
             Submission.generate_filename(1, value.name)
         except ValueError:
@@ -90,7 +83,6 @@ class SubmissionSerializer(serializers.ModelSerializer):
             if new_tag != "":
                 id = Tag.objects.get_or_create(name=new_tag)[0].id
                 tag_ids.append(id)
-        print("Validated tags into:", tag_ids)
         return tag_ids
 
     def validate_authcode(self, value):
