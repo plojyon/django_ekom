@@ -67,7 +67,7 @@ class Professor(models.Model):
 
     @property
     def full_name(self):
-        return self.first_name + " " + self.last_name
+        return "{first} {last}".format(first=self.first_name, last=self.last_name)
 
 
 class Subject(models.Model):
@@ -88,7 +88,7 @@ class AuthCode(models.Model):
     used_datetime = models.DateTimeField(null=True, blank=True)
     used_file = models.OneToOneField(
         "Submission",
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         related_name="auth_code",
         null=True,
         blank=True,
@@ -96,12 +96,8 @@ class AuthCode(models.Model):
     purpose = models.CharField(max_length=200)
 
     def __str__(self):
-        return (
-            self.code
-            + " ("
-            + ("unused" if self.used_file is None else self.used_file.title)
-            + ")"
-        )
+        status = "unused" if self.used_file is None else self.used_file.title
+        return "{code} ({status})".format(code=self.code, status=status)
 
     @property
     def authoriser(self):
@@ -201,11 +197,13 @@ class Submission(models.Model):
 
         try:
             file_count = Submission.objects.filter(subject__id=subject_id).count()
-            subject_name = Subject.objects.get(pk=subject_id).slug
+            subject_slug = Subject.objects.get(pk=subject_id).slug
         except:
             raise ValueError("Subject does not exist")
 
-        return "Zapiski_" + subject_name + "_" + str(file_count + 1) + "." + extension
+        return "Zapiski_{subject_slug}_{count}.{extension}".format(
+            subject_slug=subject_slug, count=str(file_count + 1), extension=extension
+        )
 
     @staticmethod
     def from_form_data(data):
